@@ -1,0 +1,74 @@
+import numpy as np
+import pandas as pd 
+star_df = pd.read_csv("stars.csv")
+
+star_df.head()
+star_df.isna().sum()
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+star_df.describe()
+sampled_df.describe()
+star_df = star_df.drop('A_M', 1)
+star_df.head()
+
+#Scatterplots
+sns.scatterplot(x='Temperature', y='L', hue='Type', data=star_df)
+plt.show()
+
+star_df['Temperature'] = star_df['Temperature'].astype('float64')
+star_df.dtypes
+star_df['Type'] = star_df['Type'].astype('float64')
+star_df.dtypes
+
+#Violin plot
+sns.violinplot(data=star_df, x="Type", y="Temperature")
+
+from sklearn.metrics import confusion_matrix
+X = star_df[['Temperature', 'L', 'R']]
+y = star_df['Type']
+len(X) == len(y) 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1000)
+
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+scaler.fit(X_train)
+X_train_scaled = scaler.transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+#KNN
+from sklearn.neighbors import KNeighborsClassifier
+knn = KNeighborsClassifier()
+
+knn.fit(X_train_scaled, y_train)
+y_pred = knn.predict(X_test_scaled)
+print("First 10 predicted values:", y_pred[:10])
+
+matrix = confusion_matrix(y_test, y_pred)
+sns.heatmap(
+    matrix/np.sum(matrix),
+    annot=True,
+    cmap='Blues',
+    fmt='.2%'
+)
+
+#Sklearn's pipeline
+
+from sklearn.pipeline import Pipeline
+knn_pipe = Pipeline([
+    ('scaler', StandardScaler()),
+    ('knn', KNeighborsClassifier())
+])
+
+knn_pipe.fit(X_train, y_train)
+knn_pipe.score(X_test, y_test)
+
+y_pred = knn_pipe.predict(X_test)
+
+matrix = confusion_matrix(y_test, y_pred)
+sns.heatmap(
+    matrix/np.sum(matrix),
+    annot=True,
+    cmap='Blues',
+    fmt='.2%'
+)
