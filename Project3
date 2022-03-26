@@ -1,0 +1,145 @@
+import numpy as np
+import pandas as pd
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+from sklearn import datasets, linear_model
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
+train = pd.read_csv('train.csv')
+test = pd.read_csv('test.csv')
+train.head()
+train.columns
+
+train.SalePrice.describe()
+
+train.duplicated().value_counts()
+train.dtypes
+
+##experiment 1
+df1 = train[['GrLivArea','GarageCars', 'LotArea', 'OverallQual','OverallCond', 'YearBuilt', 'BedroomAbvGr', 
+             'FullBath', 'HalfBath', 'TotalBsmtSF','SalePrice']]
+df1.head()
+
+X = df1.drop('SalePrice',axis = 1)
+y = df1.SalePrice
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3,random_state = 42)
+
+X1_train = X_train[['GrLivArea','GarageCars', 'LotArea', 'OverallQual','OverallCond', 'YearBuilt', 'BedroomAbvGr', 
+             'FullBath', 'HalfBath', 'TotalBsmtSF']]
+
+X1_test = X_test[['GrLivArea','GarageCars', 'LotArea', 'OverallQual','OverallCond', 'YearBuilt', 'BedroomAbvGr', 
+             'FullBath', 'HalfBath', 'TotalBsmtSF']]
+
+y1_train = y_train
+y1_test = y_test
+
+
+from sklearn.linear_model import LinearRegression
+linearmodel1 = LinearRegression().fit(X1_train,y1_train)
+
+coef = linearmodel1.score(X1_train, y1_train)
+print('Coefficient of Determination:', coef)
+
+y1_pred = linearmodel1.predict(X1_test)
+print(f'intercept/constant = {linearmodel1.intercept_}')
+coef_df = pd.DataFrame(linearmodel1.coef_, X1_test.columns, columns=['Coefficient'])
+coef_df
+
+from sklearn import metrics
+mae = metrics.mean_absolute_error(y1_test, y1_pred)
+mse = metrics.mean_squared_error(y1_test, y1_pred)
+rmse = metrics.mean_squared_error(y1_test, y1_pred,squared = False)
+
+print('Coefficient of Determination: {:.2f}'.format(coef*100))
+print('Mean Absolute Error:', mae)
+print('Mean Square Error:', mse)
+print('Root Mean Square Error:', rmse)
+
+
+plt.figure(figsize=(7,5))
+sns.heatmap(df1.corr(), vmin=-1, vmax=1, annot=True)
+
+##experiment 2
+df2 = train[['GrLivArea','GarageCars','GarageArea','OverallQual','YearBuilt', 
+             'FullBath', 'TotalBsmtSF','PoolArea','1stFlrSF','2ndFlrSF','SalePrice']]
+df2.head()
+X2 = df2.drop('SalePrice',axis = 1)
+y2 = df2.SalePrice
+
+X2_train, X2_test, y2_train, y2_test = train_test_split(X2, y2, test_size=0.3,random_state = 42)
+
+X3_train = X2_train[['GrLivArea','GarageCars','GarageArea','OverallQual','YearBuilt', 
+             'FullBath', 'TotalBsmtSF','PoolArea','1stFlrSF','2ndFlrSF']]
+
+X3_test = X2_test[['GrLivArea','GarageCars','GarageArea','OverallQual','YearBuilt', 
+             'FullBath', 'TotalBsmtSF','PoolArea','1stFlrSF','2ndFlrSF']]
+
+y3_train = y2_train
+y3_test = y2_test
+
+from sklearn.linear_model import LinearRegression
+linearmodel2 = LinearRegression().fit(X3_train,y3_train)
+coef = linearmodel2.score(X3_train, y3_train)
+print('Coefficient of Determination:', coef)
+
+y3_pred = linearmodel2.predict(X3_test)
+print(f'intercept/constant = {linearmodel2.intercept_}')
+coef_df = pd.DataFrame(linearmodel2.coef_, X3_test.columns, columns=['Coefficient'])
+coef_df
+
+mae = metrics.mean_absolute_error(y3_test, y3_pred)
+mse = metrics.mean_squared_error(y3_test, y3_pred)
+rmse = metrics.mean_squared_error(y3_test, y3_pred,squared = False)
+
+print('Coefficient of Determination: {:.2f}'.format(coef*100))
+print('Mean Absolute Error:', mae)
+print('Mean Square Error:', mse)
+print('Root Mean Square Error:', rmse)
+
+
+##experiment 3
+plt.figure(figsize=(7,5))
+sns.heatmap(df2.corr(), vmin=-1, vmax=1, annot=True)
+
+df3 = train[['GrLivArea','GarageCars','GarageArea','OverallQual',
+             'TotalBsmtSF','1stFlrSF','SalePrice']]
+
+X4 = df3.drop('SalePrice',axis = 1)
+y4 = df3.SalePrice
+
+X4_train, X4_test, y4_train, y4_test = train_test_split(X4, y4, test_size=0.3,random_state = 42)
+
+X5_train = X4_train[['GrLivArea','GarageCars','GarageArea','OverallQual',
+             'TotalBsmtSF','1stFlrSF']]
+
+X5_test = X4_test[['GrLivArea','GarageCars','GarageArea','OverallQual',
+             'TotalBsmtSF','1stFlrSF']]
+
+y5_train = y4_train
+y5_test = y4_test
+
+linearmodel3 = LinearRegression().fit(X5_train,y5_train)
+coef = linearmodel3.score(X5_train, y5_train)
+print('Coefficient of Determination:', coef)
+
+y5_pred = linearmodel3.predict(X5_test)
+print(f'intercept/constant = {linearmodel3.intercept_}')
+coef_df = pd.DataFrame(linearmodel3.coef_, X5_test.columns, columns=['Coefficient'])
+coef_df
+
+mae = metrics.mean_absolute_error(y5_test, y5_pred)
+mse = metrics.mean_squared_error(y5_test, y5_pred)
+rmse = metrics.mean_squared_error(y5_test, y5_pred,squared = False)
+
+print('Coefficient of Determination: {:.2f}'.format(coef*100))
+print('Mean Absolute Error:', mae)
+print('Mean Square Error:', mse)
+print('Root Mean Square Error:', rmse)
+
+
+             
+             
